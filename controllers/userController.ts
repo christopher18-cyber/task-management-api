@@ -41,6 +41,13 @@ export async function registerUser(req: Request, res: Response): Promise<Respons
             await emailService.sendVerification(user.email,verificationCode)
         }catch(emailError:any){
             logger.error(`Failed to send verification email: ${emailError.message}`)
+
+            await User.findByIdAndDelete(user._id);
+
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to send verification email. Registration aborted. Please try again.'
+            });
         }
 
         return res.status(201).json({
