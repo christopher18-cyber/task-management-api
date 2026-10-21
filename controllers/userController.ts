@@ -106,7 +106,7 @@ export async function verifyEmail(req:Request,res:Response):Promise<Response>{
         await user.save()
 
         return res.status(200).json({
-            success:false,
+            success:true,
             message:"Email verified successfully"
         })
     }catch(error:any){
