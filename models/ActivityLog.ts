@@ -3,8 +3,8 @@ import mongoose, {Schema,Document} from "mongoose";
 export interface IActivityLog extends Document{
     boardId: mongoose.Types.ObjectId;
     user: mongoose.Types.ObjectId;
-    action: String;
-    details: String;
+    action: string;
+    details: string;
     createdAt: Date;
 }
 
