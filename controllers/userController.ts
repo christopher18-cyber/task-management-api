@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import logger from "../utils/logger.js";
-import bcrypt, { genSalt } from "bcryptjs"
+import jwt from "jsonwebtoken"
+import bcrypt from "bcryptjs"
 import User from "../models/User.js";
 import { emailService } from "../utils/emailService.js";
 import { AuthRequest } from "../middleware/authMiddleware.js";
@@ -146,6 +147,17 @@ export async function loginUser(req:Request, res:Response): Promise<Response>{
             })
         }
 
+        if (!user.isVerified) {
+            return res.status(400).json({ success: false, message: 'Please verify your email before logging in.' });
+        }
+
+        
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET || "fallback_secret",
+            { expiresIn: "7d" }
+        );
+
         return res.status(200).json({
             success:true,
             message:"Login successful",
@@ -153,6 +165,7 @@ export async function loginUser(req:Request, res:Response): Promise<Response>{
                 _id:user._id,
                 name:user.name,
                 email:user.email,
+                token,
                 isVerified:user.isVerified
             }
         })
