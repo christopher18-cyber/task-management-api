@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware.js";
+import { logActivity } from "../utils/activityHelper.js";
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
 import Board from "../models/Board.js";
@@ -45,6 +46,13 @@ export async function createCard(req:AuthRequest, res:Response):Promise<Response
             assignedTo: assignedTo ? new mongoose.Types.ObjectId(assignedTo) : undefined,
             order: cardCount
         })
+
+        await logActivity({
+            boardId,
+            userId: req.user!.id,
+            action: 'CREATED_CARD',
+            details: `Created task "${title}"`
+        });
 
         return res.status(201).json({
             success:true,
