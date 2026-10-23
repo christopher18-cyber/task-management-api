@@ -1,142 +1,93 @@
-# 📋 Task Management & Collaborative Kanban API
-
-A production-grade, RESTful Task Management API built with **Node.js**, **Express**, **TypeScript**, and **MongoDB**. Designed for multi-user collaboration, real-time-capable board workflows, custom columns, activity audit logging, and bulk drag-and-drop card reordering.
-
----
-
-## 🚀 Features
-
-- **Authentication & Authorization**: Secure JWT authentication, password hashing with `bcryptjs`, and protected route middleware.
-- **Board & Member Management**: Create personal or team boards, manage collaborators, and restrict access based on roles/ownership.
-- **Custom Columns**: Dynamically create, rename, reorder, and delete custom columns for flexible board workflows.
-- **Card & Task Lifecycle**: Full CRUD operations for cards including priority levels (`Low`, `Medium`, `High`, `Urgent`), due dates, assignees, and descriptions.
-- **Bulk Card Reordering**: Batch positional updates designed for drag-and-drop Kanban frontend interactions.
-- **Activity Logging**: Automated audit trail tracking board creations, card updates, movement, and member activity.
-- **Production Ready**: Security headers via `helmet`, rate limiting with `express-rate-limit`, structured logging using `winston`, and container/cloud deployment setup.
-
----
-
-## 🛠️ Tech Stack & Tools
-
-- **Runtime**: Node.js
-- **Language**: TypeScript (executed with `tsx`)
-- **Framework**: Express.js (v5)
-- **Database**: MongoDB with Mongoose ORM
-- **Security & Auth**: JSON Web Tokens (JWT), bcryptjs, Helmet, Express Rate Limit
-- **Logger**: Winston
-- **Deployment**: Deployed on **Render**
-
----
-
-## 📂 Project Structure
-
-```text
-├── controllers/          # Business logic handlers
-│   ├── authController.ts
-│   ├── boardController.ts
-│   ├── columnController.ts
-│   ├── cardController.ts
-│   └── activityController.ts
-├── middleware/           # Express middleware (Auth, Validation, Rate Limiting)
-│   └── authMiddleware.ts
-├── models/               # Mongoose schemas & TypeScript interfaces
-│   ├── User.ts
-│   ├── Board.ts
-│   ├── Column.ts
-│   ├── Card.ts
-│   └── ActivityLog.ts
-├── routes/               # API endpoints definitions
-├── utils/                # Helper modules (Winston Logger, Activity Logger)
-│   ├── logger.ts
-│   └── activityHelper.ts
-├── server.ts             # Application entry point
-├── package.json
-└── tsconfig.json
+# task-management-api
 
 
 
-Environment VariablesCreate a .env file in the root directory and add the following variables:Code snippet
+## Getting started
 
-NODE_ENV=development
-PORT=3000
-JWT_SECRET=your_jwt_secret_key
-MONGODB_URL=your_mongodb_atlas_connection_string
+To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
-# Gmail OAuth Credentials (for email services)
-GMAIL_CLIENT_ID=your_client_id
-GMAIL_CLIENT_SECRET=your_client_secret
-GMAIL_REFRESH_TOKEN=your_refresh_token
-GMAIL_SENDER=your_email@gmail.com
+Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+
+## Add your files
+
+* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
+* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
 
 ```
+cd existing_repo
+git remote add origin https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43596906/task-management-api.git
+git branch -M main
+git push -uf origin main
+```
 
-📖 API Endpoints Reference
-🔐 Auth Routes (/api/auth)
-POST /api/auth/register — Register a new user (Auth: No)
+## Integrate with your tools
 
-POST /api/auth/login — Authenticate user & get token (Auth: No)
+* [Set up project integrations](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43596906/task-management-api/-/settings/integrations)
 
-GET /api/auth/me — Get current logged-in user details (Auth: Yes)
+## Collaborate with your team
 
-📌 Board Routes (/api/boards)
-GET /api/boards — Get all boards for current user (Auth: Yes)
+* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
+* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
+* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
+* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
+* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
 
-POST /api/boards — Create a new board (Auth: Yes)
+## Test and Deploy
 
-GET /api/boards/:id — Get single board details (Auth: Yes)
+Use the built-in continuous integration in GitLab.
 
-PUT /api/boards/:id — Update board title or description (Auth: Yes)
+* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
+* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
+* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
+* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
+* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
 
-DELETE /api/boards/:id — Delete board (Auth: Yes)
+***
 
-POST /api/boards/:id/members — Add a collaborator to board (Auth: Yes)
+# Editing this README
 
-📊 Column Routes (/api/columns)
-GET /api/columns/board/:boardId — Get all columns for a board (Auth: Yes)
+When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
 
-POST /api/columns/create — Create a custom column (Auth: Yes)
+## Suggestions for a good README
 
-PUT /api/columns/update/:id — Rename or reorder column (Auth: Yes)
+Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
-DELETE /api/columns/delete/:id — Delete column & associated cards (Auth: Yes)
+## Name
+Choose a self-explaining name for your project.
 
-🃏 Card Routes (/api/cards)
-GET /api/cards/board/:boardId — Get all cards on a board (Auth: Yes)
+## Description
+Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
-POST /api/cards — Create a new card (Auth: Yes)
+## Badges
+On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
 
-PUT /api/cards/reorder — Bulk reorder cards (drag & drop) (Auth: Yes)
+## Visuals
+Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
 
-PUT /api/cards/:id — Update card details (Auth: Yes)
+## Installation
+Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-DELETE /api/cards/:id — Delete card (Auth: Yes)
+## Usage
+Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-📜 Activity Routes (/api/activities)
-GET /api/activities/board/:boardId — Fetch audit logs for a board (Auth: Yes)
+## Support
+Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
 
-🏃 Getting Started Locally
-Clone the repository:
+## Roadmap
+If you have ideas for releases in the future, it is a good idea to list them in the README.
 
-Bash
-git clone [https://github.com/your-username/task-management-api.git](https://github.com/your-username/task-management-api.git)
-cd task-management-api
-Install dependencies:
+## Contributing
+State if you are open to contributions and what your requirements are for accepting them.
 
-Bash
-npm install
-Start development server:
+For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
 
-Bash
-npm run dev
-Production Start:
+You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
 
-Bash
-npm start
-🚢 Deployment
-This API is deployed on Render. When deploying to production:
+## Authors and acknowledgment
+Show your appreciation to those who have contributed to the project.
 
-Set NODE_ENV=production in the environment configuration.
+## License
+For open source projects, say how it is licensed.
 
-Set Build Command: npm install
-
-Set Start Command: npm start
+## Project status
+If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
