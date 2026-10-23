@@ -32,6 +32,8 @@ app.use("/api/boards", boardRouter)
 app.use("/api/cards",cardRouter)
 app.use("/api/columns",columnRouter)
 app.use("/api/activities", activityRouter)
+
+
 app.listen(PORT,()=>{
     logger.info(`Server is running on ${PORT}`)
 })
