@@ -167,3 +167,70 @@ export async function deleteCard(req:AuthRequest, res:Response):Promise<Response
         })
     }
 }
+
+
+export async function reorderCards(req:AuthRequest, res:Response):Promise<Response>{
+    logger.info("Re order endpoint hitted")
+    try{
+        const {boardId, updates} = req.body;
+        const userId = req.user?.id;
+
+        if(!boardId || !updates || !Array.isArray(updates)){
+            return res.status(400).json({
+                success:false,
+                message: "Please provide boardId and an array of card updates."
+            })
+        }
+
+        const board = await Board.findById(boardId)
+        if(!board){
+            return res.status(404).json({
+                success: false,
+                message: "Board not found"
+            })
+        }
+
+        const isOwner = board.owner && board.owner.toString() === userId;
+        const isMember = board.member.some((m:any)=> m.toString() === userId)
+        if(!isOwner && !isMember){
+            return res.status(403).json({
+                success:false,
+                message:"Not authorized to modify this board"
+            })
+        }
+
+
+        const updateOperations = updates.map(async (item:{id:string; columnId:string; order:number})=>{
+            return Card.findByIdAndUpdate(
+                item.id,
+                {
+                    columId: new mongoose.Types.ObjectId(item.columnId),
+                    order: item.order
+                },
+                {
+                    new: true
+                }
+            )
+        })
+
+        await Promise.all(updateOperations)
+
+        await logActivity({
+            boardId,
+            userId: userId!,
+            action: 'REORDER_CARDS',
+            details: 'Updated card positions and columns on the board'
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Cards reordered successfully'
+        });
+    }catch(error:any){
+        logger.error(`Reorder cards error :${error.message}`)
+        return res.status(500).json({
+            success:false,
+            error: error.message
+        })
+    }
+}
