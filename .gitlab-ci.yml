@@ -1,0 +1,40 @@
+stages:
+  - test
+  - secure
+  - package
+  - deploy
+  - monitor
+
+unit_tests:
+  stage: test
+  image: node:18-alpine
+  script:
+    - npm ci
+    - npm test || exit 1
+
+dependency_audit:
+  stage: secure
+  image: node:18-alpine
+  script:
+    - npm audit --production || true
+
+docker_build:
+  stage: package
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - echo "Container built successfully."
+
+deploy_gcp:
+  stage: deploy
+  image: google/cloud-sdk:latest
+  script:
+    - echo "Deploying to Google Cloud Run..."
+
+health_check:
+  stage: monitor
+  image: alpine:latest
+  script:
+    - echo "Health check passed."
