@@ -1,8 +1,8 @@
 import mongoose, {Schema, Document} from "mongoose";
 
 export interface ICard extends Document{
-    title: String;
-    description?: String;
+    title: string;
+    description?: string;
     columnId: mongoose.Types.ObjectId;
     boardId: mongoose.Types.ObjectId;
     assignedTo?: mongoose.Types.ObjectId;

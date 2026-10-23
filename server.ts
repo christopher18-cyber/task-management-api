@@ -25,7 +25,7 @@ const limiter = rateLimit({
 connectToDB()
 
 app.use("/api/user", userRouter)
-app.use("/api/board", boardRouter)
+app.use("/api/boards", boardRouter)
 
 app.listen(PORT,()=>{
     logger.info(`Server is running on ${PORT}`)
