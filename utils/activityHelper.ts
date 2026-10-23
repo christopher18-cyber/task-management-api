@@ -9,11 +9,11 @@ interface LogActivityParams {
     details?: string;
 }
 
-export async function logActivity({ boardId, userId, action, details }: LogActivityParams): void {
+export async function logActivity({ boardId, userId, action, details }: LogActivityParams): Promise<void> {
     try {
         await ActivityLog.create({
             boardId: new mongoose.Types.ObjectId(boardId),
-            userId: new mongoose.Types.ObjectId(userId),
+            user: new mongoose.Types.ObjectId(userId),
             action,
             details
         });
