@@ -4,6 +4,8 @@ import helmet from "helmet";
 import userRouter from "./routes/userRoutes.js"
 import boardRouter from "./routes/boardRoutes.js"
 import cardRouter from "./routes/cardRoutes.js"
+import columnRouter from "./routes/columnRoutes.js"
+import activityRouter from "./routes/activityRoutes.js"
 import rateLimit from "express-rate-limit";
 import logger from "./utils/logger.js";
 import { connectToDB } from "./database/db.js";
@@ -28,7 +30,8 @@ connectToDB()
 app.use("/api/user", userRouter)
 app.use("/api/boards", boardRouter)
 app.use("/api/cards",cardRouter)
-
+app.use("/api/columns",columnRouter)
+app.use("/api/activities", activityRouter)
 app.listen(PORT,()=>{
     logger.info(`Server is running on ${PORT}`)
 })
