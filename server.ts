@@ -1,6 +1,8 @@
 import "dotenv/config"
 import express from "express"
 import helmet from "helmet";
+import cors from "cors"
+import { corsOptions } from "./middleware/cors.js";
 import userRouter from "./routes/userRoutes.js"
 import boardRouter from "./routes/boardRoutes.js"
 import cardRouter from "./routes/cardRoutes.js"
@@ -12,6 +14,8 @@ import { connectToDB } from "./database/db.js";
 
 
 const app = express()
+
+app.use(cors(corsOptions))
 
 const PORT = process.env.PORT || 3000
 
