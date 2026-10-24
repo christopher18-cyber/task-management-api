@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "test": "echo 'Tests passed successfully' && exit 0",
+    "test": "echo 'Simulating pipeline failure' && exit 1",
     "build": "tsc",
     "dev": "nodemon --exec tsx server.ts",
     "start": "tsx server.ts"
