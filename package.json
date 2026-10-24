@@ -5,6 +5,7 @@
   "main": "server.ts",
   "scripts": {
     "test": "echo 'Tests passed successfully' && exit 0",
+    "build": "tsc",
     "dev": "nodemon --exec tsx server.ts",
     "start": "tsx server.ts"
   },
