@@ -119,14 +119,14 @@ export async function addMemberToBoard(req:AuthRequest, res:Response):Promise<Re
             return res.status(400).json({ success: false, message: 'User is already the owner of this board' });
         }
 
-        if(board.member.includes(userToAdd._id)){
+        if(board.members.includes(userToAdd._id)){
             return res.status(400).json({
                 success:false,
                 message:"User is already a member of this board"
             })
         }
 
-        board.member.push(userToAdd._id)
+        board.members.push(userToAdd._id)
         await board.save()
 
         return res.status(200).json({
@@ -159,7 +159,7 @@ export async function getBoardById(req:AuthRequest, res:Response):Promise<Respon
         }
 
         const isOwner = board.owner && board.owner._id.toString() === userId;
-        const isMember = board.member.some((member: any) => member._id.toString() === userId);
+        const isMember = board.members.some((member: any) => member._id.toString() === userId);
 
         if (!isOwner && !isMember) {
             return res.status(403).json({ success: false, message: 'Not authorized to view this board' });

@@ -191,7 +191,7 @@ export async function reorderCards(req:AuthRequest, res:Response):Promise<Respon
         }
 
         const isOwner = board.owner && board.owner.toString() === userId;
-        const isMember = board.member.some((m:any)=> m.toString() === userId)
+        const isMember = board.members.some((m:any)=> m.toString() === userId)
         if(!isOwner && !isMember){
             return res.status(403).json({
                 success:false,

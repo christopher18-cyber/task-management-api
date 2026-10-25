@@ -19,7 +19,7 @@ export async function getBoardActivities(req:AuthRequest, res:Response): Promise
         }
 
         const isOwner = board.owner && board.owner.toString() === userId;
-        const ismember =  board.member.some((m:any)=> m.toString() === userId)
+        const ismember =  board.members.some((m:any)=> m.toString() === userId)
 
         if(!isOwner && !ismember){
             return res.status(403).json({

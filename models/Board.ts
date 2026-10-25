@@ -3,7 +3,7 @@ export interface IBoard extends Document{
     title: string,
     description? : string;
     owner: mongoose.Types.ObjectId;
-    member: mongoose.Types.ObjectId[];
+    members: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
 }
