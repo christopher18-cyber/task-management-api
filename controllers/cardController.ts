@@ -7,10 +7,9 @@ import Board from "../models/Board.js";
 import Column from "../models/Column.js";
 import Card from "../models/Card.js";
 
-
-export async function createCard(req:AuthRequest, res:Response):Promise<Response>{
-    logger.info("Create endpoint hitted")
-    try{
+export async function createCard(req: AuthRequest, res: Response): Promise<Response> {
+    logger.info("Create card endpoint hitted");
+    try {
         const { title, description, columnId, boardId, priority, dueDate, assignedTo } = req.body;
         if (!title || !columnId || !boardId) {
             return res.status(400).json({
@@ -19,33 +18,39 @@ export async function createCard(req:AuthRequest, res:Response):Promise<Response
             });
         }
 
-        const board = await Board.findById(boardId)
-        if(!board){
+        const board = await Board.findById(boardId);
+        if (!board) {
             return res.status(404).json({
-                success:false,
-                message:"Board not found."
-            })
+                success: false,
+                message: "Board not found."
+            });
         }
 
-        const column = await Column.findOne({_id:columnId,board:boardId})
-        if(!column){
+        // Fixed field lookup to match Column schema (boardId)
+        const column = await Column.findOne({
+            _id: columnId,
+            $or: [{ boardId: boardId }, { board: boardId }]
+        });
+
+        if (!column) {
             return res.status(404).json({
-                success:false,
-                message:"Column not found on this board"
-            })
+                success: false,
+                message: "Column not found on this board"
+            });
         }
-        const cardCount = await Card.countDocuments({columnId})
+        
+        const cardCount = await Card.countDocuments({ columnId });
 
         const card = await Card.create({
             title,
             description,
             columnId: new mongoose.Types.ObjectId(columnId),
             boardId: new mongoose.Types.ObjectId(boardId),
-            priority: priority || "Medium",
+            priority: priority || "medium",
             dueDate: dueDate ? new Date(dueDate) : undefined,
             assignedTo: assignedTo ? new mongoose.Types.ObjectId(assignedTo) : undefined,
             order: cardCount
-        })
+        });
 
         await logActivity({
             boardId,
@@ -55,67 +60,66 @@ export async function createCard(req:AuthRequest, res:Response):Promise<Response
         });
 
         return res.status(201).json({
-            success:true,
-            message:"Card created successfully",
-            data:card
-        })
-    }catch(error:any){
-        logger.error(`Create card error: ${error.message}`)
+            success: true,
+            message: "Card created successfully",
+            data: card
+        });
+    } catch (error: any) {
+        logger.error(`Create card error: ${error.message}`);
         return res.status(500).json({
-            success:false,
-            error:error.message
-        })
+            success: false,
+            error: error.message
+        });
     }
 }
 
-
-
-export async function getCardsByBoard(req:AuthRequest, res:Response):Promise<Response>{
-    logger.info("Get cards by board endpoint hitted")
-    try{
-        const {boardId} = req.params;
-        const cards = await Card.find({boardId}).sort({order:1});
+export async function getCardsByBoard(req: AuthRequest, res: Response): Promise<Response> {
+    logger.info("Get cards by board endpoint hitted");
+    try {
+        const { boardId } = req.params;
+        const cards = await Card.find({ boardId }).sort({ order: 1 });
 
         return res.status(200).json({
-            success:true,
+            success: true,
             count: cards.length,
             data: cards
-        })
-    }catch(error:any){
-        logger.error(`Get cards error: ${error.message}`)
+        });
+    } catch (error: any) {
+        logger.error(`Get cards error: ${error.message}`);
         return res.status(500).json({
-            success:false,
+            success: false,
             error: error.message
-        })
+        });
     }
 }
 
+export async function updateCard(req: AuthRequest, res: Response): Promise<Response> {
+    logger.info(`Update card endpoint hitted`);
+    try {
+        const { id } = req.params;
+        const { title, description, columnId, priority, dueDate, assignedTo, order } = req.body;
 
-export async function updateCard(req:AuthRequest, res:Response):Promise<Response>{
-    logger.info(`Update card endpoint hitted`)
-    try{
-        const {id} = req.params;
-        const {title,description,columnId, priority, dueDate, assignedTo, order } = req.body;
-
-        const card = await Card.findById(id)
-        if(!card){
+        const card = await Card.findById(id);
+        if (!card) {
             return res.status(404).json({
-                success:false,
-                message:"Card not found."
-            })
+                success: false,
+                message: "Card not found."
+            });
         }
 
-
-        if(columnId && columnId !== card.columnId.toString()){
-            const targetColumn = await Column.findOne({_id:columnId,board:card.boardId})
-            if(!targetColumn){
+        if (columnId && columnId !== card.columnId.toString()) {
+            const targetColumn = await Column.findOne({
+                _id: columnId,
+                $or: [{ boardId: card.boardId }, { board: card.boardId }]
+            });
+            if (!targetColumn) {
                 return res.status(404).json({
-                    success:false,
-                    message:"Target not found on this board."
-                })
+                    success: false,
+                    message: "Target column not found on this board."
+                });
             }
 
-            card.columnId = new mongoose.Types.ObjectId(columnId)
+            card.columnId = new mongoose.Types.ObjectId(columnId);
         }
 
         if (title !== undefined) card.title = title;
@@ -132,88 +136,85 @@ export async function updateCard(req:AuthRequest, res:Response):Promise<Response
             message: 'Card updated successfully',
             data: card
         });
-    }catch(error:any){
-        logger.error(``)
+    } catch (error: any) {
+        logger.error(`Update card error: ${error.message}`);
         return res.status(500).json({
-            success:false,
-            error:error.message
-        })
+            success: false,
+            error: error.message
+        });
     }
 }
 
+export async function deleteCard(req: AuthRequest, res: Response): Promise<Response> {
+    logger.info("Delete card endpoint hitted");
+    try {
+        const { id } = req.params;
+        const card = await Card.findByIdAndDelete(id);
 
-export async function deleteCard(req:AuthRequest, res:Response):Promise<Response>{
-    logger.info("Delete card endpoint hitted")
-    try{
-        const {id} = req.params;
-        const card = await Card.findByIdAndDelete(id)
-
-        if(!card){
+        if (!card) {
             return res.status(404).json({
-                success:false,
-                message:"Card not found."
-            })
+                success: false,
+                message: "Card not found."
+            });
         }
 
         return res.status(200).json({
-            success:true,
-            message:"Card deleted successfully."
-        })
-    }catch(error:any){
-        logger.error(`Delete card error: ${error.message}`)
+            success: true,
+            message: "Card deleted successfully."
+        });
+    } catch (error: any) {
+        logger.error(`Delete card error: ${error.message}`);
         return res.status(500).json({
-            success:false,
+            success: false,
             error: error.message
-        })
+        });
     }
 }
 
-
-export async function reorderCards(req:AuthRequest, res:Response):Promise<Response>{
-    logger.info("Re order endpoint hitted")
-    try{
-        const {boardId, updates} = req.body;
+export async function reorderCards(req: AuthRequest, res: Response): Promise<Response> {
+    logger.info("Re order endpoint hitted");
+    try {
+        const { boardId, updates } = req.body;
         const userId = req.user?.id;
 
-        if(!boardId || !updates || !Array.isArray(updates)){
+        if (!boardId || !updates || !Array.isArray(updates)) {
             return res.status(400).json({
-                success:false,
+                success: false,
                 message: "Please provide boardId and an array of card updates."
-            })
+            });
         }
 
-        const board = await Board.findById(boardId)
-        if(!board){
+        const board = await Board.findById(boardId);
+        if (!board) {
             return res.status(404).json({
                 success: false,
                 message: "Board not found"
-            })
+            });
         }
 
         const isOwner = board.owner && board.owner.toString() === userId;
-        const isMember = board.members.some((m:any)=> m.toString() === userId)
-        if(!isOwner && !isMember){
+        const isMember = Array.isArray(board.members) && board.members.some((m: any) => m?.toString() === userId);
+        if (!isOwner && !isMember) {
             return res.status(403).json({
-                success:false,
-                message:"Not authorized to modify this board"
-            })
+                success: false,
+                message: "Not authorized to modify this board"
+            });
         }
 
-
-        const updateOperations = updates.map(async (item:{id:string; columnId:string; order:number})=>{
+        const updateOperations = updates.map(async (item: { id: string; columnId: string; order: number }) => {
             return Card.findByIdAndUpdate(
                 item.id,
                 {
-                    columId: new mongoose.Types.ObjectId(item.columnId),
+                    columnId: new mongoose.Types.ObjectId(item.columnId), // Fixed typo (columId -> columnId)
                     order: item.order
                 },
                 {
                     new: true
                 }
-            )
-        })
+            );
+        });
 
-        await Promise.all(updateOperations)
+        await Promise.all(updateOperations);
 
         await logActivity({
             boardId,
@@ -226,11 +227,11 @@ export async function reorderCards(req:AuthRequest, res:Response):Promise<Respon
             success: true,
             message: 'Cards reordered successfully'
         });
-    }catch(error:any){
-        logger.error(`Reorder cards error :${error.message}`)
+    } catch (error: any) {
+        logger.error(`Reorder cards error :${error.message}`);
         return res.status(500).json({
-            success:false,
+            success: false,
             error: error.message
-        })
+        });
     }
 }
