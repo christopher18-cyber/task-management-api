@@ -22,7 +22,7 @@ const CardSchema: Schema = new Schema(
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
     priority: { 
       type: String, 
-      enum: ['Low', 'Medium', 'High', 'Urgent'], 
+      enum: ['low', 'medium', 'high', 'urgent'], 
       default: 'Medium' 
     },
     dueDate: { type: Date, required: false },
