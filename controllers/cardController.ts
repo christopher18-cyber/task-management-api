@@ -131,6 +131,13 @@ export async function updateCard(req: AuthRequest, res: Response): Promise<Respo
 
         await card.save();
 
+        await logActivity({
+            boardId: card.boardId,
+            userId: req.user!.id,
+            action: 'UPDATED_CARD',
+            details: `Updated task "${card.title}"`
+        });
+
         return res.status(200).json({
             success: true,
             message: 'Card updated successfully',
@@ -157,6 +164,13 @@ export async function deleteCard(req: AuthRequest, res: Response): Promise<Respo
                 message: "Card not found."
             });
         }
+
+        await logActivity({
+            boardId: card.boardId,
+            userId: req.user!.id,
+            action: 'DELETED_CARD',
+            details: `Deleted task "${card.title}"`
+        });
 
         return res.status(200).json({
             success: true,

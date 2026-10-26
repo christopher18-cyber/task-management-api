@@ -30,7 +30,7 @@ export async function getBoardActivities(req:AuthRequest, res:Response): Promise
 
 
         const activities = await ActivityLog.find({boardId})
-        .populate("userId","name email")
+        .populate("user", "name email")
         .sort({createdAt: -1})
         .limit(50)
 
