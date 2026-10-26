@@ -3,7 +3,7 @@ import { CorsOptions } from "cors";
 // Define allowed origins (local development + your future production frontend domain)
 const allowedOrigins = [
     "http://localhost:5173",
-    "http://localhost:3000"
+    "https://task-management-frontend-2ro9qh93x.vercel.app"
 ];
 
 export const corsOptions: CorsOptions = {
