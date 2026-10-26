@@ -1,5 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware.js";
+import ActivityLog from "../models/ActivityLog.js";
+import Card from "../models/Card.js";
 import Board from "../models/Board.js";
 import logger from "../utils/logger.js";
 import Column from "../models/Column.js";
@@ -175,5 +177,50 @@ export async function getBoardById(req:AuthRequest, res:Response):Promise<Respon
             success:false,
             error:error.message
         })
+    }
+}
+
+
+
+export async function deleteBoard(req: AuthRequest, res: Response): Promise<Response> {
+    logger.info(`Delete board endpoint hit`);
+    try {
+        const { id } = req.params;
+        const userId = req.user?.id;
+
+        const board = await Board.findById(id);
+        if (!board) {
+            return res.status(404).json({
+                success: false,
+                message: "Board not found."
+            });
+        }
+
+        // Verify that only the board owner can delete it
+        if (!board.owner || board.owner.toString() !== userId) {
+            return res.status(403).json({
+                success: false,
+                message: "Only the board owner can delete this board."
+            });
+        }
+
+        // Cascade delete: remove all columns, cards, and activity logs tied to this board
+        await Column.deleteMany({ boardId: id });
+        await Card.deleteMany({ boardId: id });
+        await ActivityLog.deleteMany({ boardId: id });
+
+        // Delete the board itself
+        await Board.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Board and all associated data deleted successfully."
+        });
+    } catch (error: any) {
+        logger.error(`Delete board error: ${error.message}`);
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 }
