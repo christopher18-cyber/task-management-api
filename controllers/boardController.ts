@@ -77,7 +77,7 @@ export async function getBoards(req:AuthRequest, res:Response):Promise<Response>
 
 
 export async function addMemberToBoard(req:AuthRequest, res:Response):Promise<Response>{
-    logger.info(``)
+    logger.info(`Add member to board endpoint hitted`)
     try{
         const {id} = req.params;
         const {email} = req.body;
@@ -99,7 +99,7 @@ export async function addMemberToBoard(req:AuthRequest, res:Response):Promise<Re
             })
         }
 
-        if(board.owner && board.owner.toString() == userId){
+        if(board.owner && board.owner.toString() !== userId){
             return res.status(403).json({
                 success:false,
                 message:"Only the board owner can add member"
