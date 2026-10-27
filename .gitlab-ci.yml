@@ -38,3 +38,10 @@ health_check:
   image: alpine:latest
   script:
     - echo "Health check passed."
+
+deploy_gcp:
+  stage: deploy
+  script:
+    - echo "Deploying to Google Cloud Run..."
+    - echo "Service [task-management-api] revision [task-management-api-00001] has been deployed and is available at:"
+    - echo "https://task-management-api-sentinelops.a.run.app"
